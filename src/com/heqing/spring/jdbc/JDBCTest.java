@@ -2,7 +2,9 @@ package com.heqing.spring.jdbc;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.sql.DataSource;
 
@@ -12,16 +14,37 @@ import org.springframework.context.support.ClassPathXmlApplicationContext;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
+import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 
 public class JDBCTest {
 
 	private ApplicationContext ctx = null;
 	private JdbcTemplate jdbcTemplate;
+	private NamedParameterJdbcTemplate namedParameterJdbcTemplate;
 	
 	{
 		ctx = new ClassPathXmlApplicationContext("applicationContext.xml");
 		jdbcTemplate = (JdbcTemplate) ctx.getBean("jdbcTemplate");
+		namedParameterJdbcTemplate = (NamedParameterJdbcTemplate) ctx
+				.getBean("namedParameterJdbcTemplate");
 	}
+	
+	/**
+	 * 具名参数：可以为参数取名字
+	 */
+	@Test
+	public void testNamedParameterJdbcTemplate(){
+		String sql = "INSERT INTO employee(employeeName, employeeSalary"
+				+ ", employeeEmail, dept_id) VALUES(:name,:salary,:email,:dept_id)";
+		Map<String, Object> paramMap = new HashMap<>();
+		paramMap.put("name", "HQOCSH");
+		paramMap.put("email", "heiqng@utlook.com");
+		paramMap.put("salary", 10);
+		paramMap.put("dept_id", "heha");
+		namedParameterJdbcTemplate.update(sql, paramMap);
+	}
+	
+	
 	/**
 	 * 从数据库获取一条记录，并且得到对应的一个对象
 	 * 1.其中的RowMapper指定如何去映射结果集的行
@@ -61,8 +84,6 @@ public class JDBCTest {
 		long count = jdbcTemplate.queryForObject(sql, Long.class);
 		System.out.println("一共有记录："+count);
 	}
-	
-	
 	
 	/**
 	 * 批量操作
