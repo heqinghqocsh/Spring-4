@@ -14,7 +14,9 @@ import org.springframework.context.support.ClassPathXmlApplicationContext;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
+import org.springframework.jdbc.core.namedparam.BeanPropertySqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
+import org.springframework.jdbc.core.namedparam.SqlParameterSource;
 
 public class JDBCTest {
 
@@ -30,7 +32,25 @@ public class JDBCTest {
 	}
 	
 	/**
+	 * 使用具名参数是可以使用update(String sql, SqlParameterSource paramSource) 方法进行更新操作
+	 * 1.SQL语句中的参数名和类的属性一致
+	 * 2.使用BeanPropertySqlParameterSource作为参数
+	 * 	 */
+	@Test
+	public void testNamedParameterJdbcTemplate2(){
+		String sql = "INSERT INTO department(departmentName) VALUES(:name)";
+		Department department = new Department();
+		department.setName("xxxxxxx");
+		SqlParameterSource paramSource = new BeanPropertySqlParameterSource(department);
+		namedParameterJdbcTemplate.update(sql, paramSource);
+		
+	}
+	
+	
+	/**
 	 * 具名参数：可以为参数取名字
+	 * 1.好处：若有多个参数，则不用去对应位置，便于维护
+	 * 2.缺点：较为麻烦
 	 */
 	@Test
 	public void testNamedParameterJdbcTemplate(){
